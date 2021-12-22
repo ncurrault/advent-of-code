@@ -2,7 +2,7 @@ from functools import reduce
 from itertools import product
 from collections import defaultdict
 
-PRACTICE = True
+PRACTICE = False
 
 with open("test2.txt" if PRACTICE else "input.txt", "r") as f:
     content = f.read().strip()
@@ -15,6 +15,20 @@ def interval_intersection(min1, max1, min2, max2):
 
     return max(min1, min2), min(max1, max2)
 
+
+cube_str_format = """
+- - - - - - - y={max_y}
+| \\         | \\
+|   \\       |   \\  y={min_y}
+|     - - - - - - - z={max_z}
+|     |     |     |
+|     |     |     |
+- - - | - - -     |
+  \\   |       \\   |
+    \\ |         \\ | z={min_z}
+      - - - - - - -
+     x={min_x:<5}      x={max_x}
+"""[1:-1]
 
 class Cuboid:
     def __init__(self, _x_bounds, _y_bounds, _z_bounds):
@@ -34,6 +48,10 @@ class Cuboid:
             return False
         return self._key() == other._key()
 
+    def __str__(self):
+        return cube_str_format.format(min_x=self.x_bounds[0], max_x=self.x_bounds[1],
+            min_y=self.y_bounds[0], max_y=self.y_bounds[1], min_z=self.z_bounds[0], max_z=self.z_bounds[1])
+
     def intersection(self, other):
         x_bounds = interval_intersection(*self.x_bounds, *other.x_bounds)
         y_bounds = interval_intersection(*self.y_bounds, *other.y_bounds)
@@ -47,7 +65,7 @@ class Cuboid:
         return other == self.intersection(other)
 
     def volume(self):
-        edges = (b[1] - b[0] for b in (self.x_bounds, self.y_bounds, self.z_bounds))
+        edges = (b[1] - b[0] + 1 for b in (self.x_bounds, self.y_bounds, self.z_bounds))
         return reduce(lambda x, y: x * y, edges, 1)
 
     def fracture(self, sub_cuboid):
@@ -85,6 +103,7 @@ class Cuboid:
             else None
         )
 
+        # faces
         if pos_x_bounds:
             res.append(Cuboid(pos_x_bounds, sub_cuboid.y_bounds, sub_cuboid.z_bounds))
         if pos_y_bounds:
@@ -98,6 +117,35 @@ class Cuboid:
         if neg_z_bounds:
             res.append(Cuboid(sub_cuboid.x_bounds, sub_cuboid.y_bounds, neg_z_bounds))
 
+        # edges
+        if pos_x_bounds and pos_y_bounds:
+            res.append(Cuboid(pos_x_bounds, pos_y_bounds, sub_cuboid.z_bounds))
+        if pos_x_bounds and neg_y_bounds:
+            res.append(Cuboid(pos_x_bounds, neg_y_bounds, sub_cuboid.z_bounds))
+        if neg_x_bounds and pos_y_bounds:
+            res.append(Cuboid(neg_x_bounds, pos_y_bounds, sub_cuboid.z_bounds))
+        if neg_x_bounds and neg_y_bounds:
+            res.append(Cuboid(neg_x_bounds, neg_y_bounds, sub_cuboid.z_bounds))
+
+        if pos_x_bounds and pos_z_bounds:
+            res.append(Cuboid(pos_x_bounds, sub_cuboid.y_bounds, pos_z_bounds))
+        if pos_x_bounds and neg_z_bounds:
+            res.append(Cuboid(pos_x_bounds, sub_cuboid.y_bounds, neg_z_bounds))
+        if neg_x_bounds and pos_z_bounds:
+            res.append(Cuboid(neg_x_bounds, sub_cuboid.y_bounds, pos_z_bounds))
+        if neg_x_bounds and neg_z_bounds:
+            res.append(Cuboid(neg_x_bounds, sub_cuboid.y_bounds, neg_z_bounds))
+
+        if pos_y_bounds and pos_z_bounds:
+            res.append(Cuboid(sub_cuboid.x_bounds, pos_y_bounds, pos_z_bounds))
+        if pos_y_bounds and neg_z_bounds:
+            res.append(Cuboid(sub_cuboid.x_bounds, pos_y_bounds, neg_z_bounds))
+        if neg_y_bounds and pos_z_bounds:
+            res.append(Cuboid(sub_cuboid.x_bounds, neg_y_bounds, pos_z_bounds))
+        if neg_y_bounds and neg_z_bounds:
+            res.append(Cuboid(sub_cuboid.x_bounds, neg_y_bounds, neg_z_bounds))
+
+        # corners
         if pos_x_bounds and pos_y_bounds and pos_z_bounds:
             res.append(Cuboid(pos_x_bounds, pos_y_bounds, pos_z_bounds))
         if pos_x_bounds and pos_y_bounds and neg_z_bounds:
@@ -198,4 +246,3 @@ res = 0
 for c in cuboids_on:
     res += c.volume()
 print(res)
-print(2758514936282235)
