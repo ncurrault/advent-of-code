@@ -1,6 +1,4 @@
 from functools import reduce
-from itertools import product
-from collections import defaultdict
 
 PRACTICE = False
 
@@ -16,6 +14,7 @@ def interval_intersection(min1, max1, min2, max2):
     return max(min1, min2), min(max1, max2)
 
 
+# https://1j01.github.io/ascii-hypercube/
 cube_str_format = """
 - - - - - - - y={max_y}
 | \\         | \\
