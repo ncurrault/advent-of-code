@@ -1,9 +1,6 @@
 from itertools import product
 import numpy as np
 
-# consider intersection of voxel sets (overlap region -- a rectangular prism)
-# specifically, consider overlaps (from each of 8 vertices) that yield exactly 12 points
-
 PRACTICE = False
 PADDING = 200
 
