@@ -43,6 +43,9 @@ visited = [[False] * width for _ in range(height)]
 distance = [[inf] * width for _ in range(height)]
 distance[0][0] = 0
 
+# source for pq implementation:
+# https://docs.python.org/3/library/heapq.html#priority-queue-implementation-notes
+
 pq = []                         # list of entries arranged in a heap
 entry_finder = {}               # mapping of tasks to entries
 REMOVED = '<removed-task>'      # placeholder for a removed task
