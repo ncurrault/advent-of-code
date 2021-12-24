@@ -3,7 +3,7 @@ from collections import defaultdict
 from math import inf
 from heapq import heappush, heappop
 
-PRACTICE = True
+PRACTICE = False
 
 """
 current state is represented as a string "abcdefghijklmno" (len 15) where
@@ -57,6 +57,8 @@ print_state_str_format = """
 """
 def state_str(state):
     return print_state_str_format.format(*state)
+def print_state(state):
+    print(state_str(state))
 
 def swap_chars(s, i, j):
     l = list(s)
@@ -122,7 +124,7 @@ def hallway_to_room_dist(state, hallway_loc, destination):
         (14, 5): 7,
         (14, 8): 5,
         (14, 11): 3
-    }.get((hallway_loc, destination), 2)
+    }.get((hallway_loc, destination), 2) + int(plus_one)
 
 def valid_transitions(state):
     for loc in range(15):
