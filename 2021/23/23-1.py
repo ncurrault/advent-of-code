@@ -3,7 +3,7 @@ from collections import defaultdict
 from math import inf
 from heapq import heappush, heappop
 
-PRACTICE = False
+PRACTICE = True
 
 """
 current state is represented as a string "abcdefghijklmno" (len 15) where
@@ -23,14 +23,8 @@ or
 start_state = "..BA.CD.BC.DA.." if PRACTICE else "..CC.AA.BD.DB.."
 end_state = "..AA.BB.CC.DD.."
 
-
-def is_hallway(loc):
-    assert loc >= 0 and loc <= 14
-    return loc in (0, 1, 4, 7, 10, 13, 14)
-
-
-def is_occupied(state, loc):
-    return state[loc] in "ABCD"
+CENTER_HALLWAY = [1, 4, 7, 10, 13]
+FULL_HALLWAY = [0] + CENTER_HALLWAY + [14]
 
 LEFT_PATHS = {
     2: [1, 0],
@@ -60,6 +54,12 @@ def state_str(state):
 def print_state(state):
     print(state_str(state))
 
+def is_hallway(loc):
+    return loc in FULL_HALLWAY
+
+def is_occupied(state, loc):
+    return state[loc] in "ABCD"
+
 def swap_chars(s, i, j):
     l = list(s)
     l[i], l[j] = l[j], l[i]
@@ -77,30 +77,10 @@ def hallway_to_room_dist(state, hallway_loc, destination):
     plus_one = destination in ROOM_BOTTOMS
     if plus_one:
         destination -= 1
-    # TODO just subset of [1,4,7,10,13] in open interval?
-    blockers = {
-        (0, 2): [1],
-        (0, 5): [1, 4],
-        (0, 8): [1, 4, 7],
-        (0, 11): [1, 4, 7, 10],
-        (1, 5): [4],
-        (1, 8): [4, 7],
-        (1, 11): [4, 7, 10],
-        (4, 8): [7],
-        (4, 11): [10],
-        (7, 2): [4],
-        (7, 11): [10],
-        (10, 2): [4, 7],
-        (10, 5): [7],
-        (13, 2): [4, 7, 10],
-        (13, 5): [7, 10],
-        (13, 8): [10],
-        (14, 2): [4, 7, 10, 13],
-        (14, 5): [7, 10, 13],
-        (14, 8): [10, 13],
-        (14, 11): [13],
-    }.get((hallway_loc, destination), [])
-    for b in blockers:
+
+    for b in [1, 4, 7, 10, 13]:
+        if b <= min(hallway_loc, destination) or b >= max(hallway_loc, destination):
+            continue
         if is_occupied(state, b):
             return
     return {
