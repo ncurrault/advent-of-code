@@ -3,7 +3,7 @@ from collections import defaultdict
 from math import inf
 from heapq import heappush, heappop
 
-PRACTICE = True
+PRACTICE = False
 
 """
 current state is represented as a length-23 string
@@ -109,7 +109,7 @@ def hallway_to_room_dist(state, hallway_loc, destination):
         (22, 17): 3
     }.get((hallway_loc, destination), 2) + steps_within_room
 
-def valid_transitions(state):
+def valid_transitions(state, goal_state):
     for loc in range(NUM_SPACES):
         if not is_occupied(state, loc):
             continue
@@ -119,6 +119,8 @@ def valid_transitions(state):
             for destination in room_destinations_from_hallway(state, occupant):
                 d = hallway_to_room_dist(state, loc, destination)
                 if d is None:
+                    continue
+                if goal_state[destination] != occupant:
                     continue
                 yield swap_chars(state, loc, destination), d * per_move_energy
         else:
@@ -210,7 +212,7 @@ while True:
     if state == end_state:
         break
 
-    for next_state, energy in valid_transitions(state):
+    for next_state, energy in valid_transitions(state, end_state):
         candidate_distance = distance[state] + energy
         if candidate_distance < distance[next_state]:
             distance[next_state] = candidate_distance
