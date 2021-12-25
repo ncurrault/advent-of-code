@@ -147,9 +147,29 @@ print_state_str_format = """
   #########
 """
 
+def state_str(state):
+    return print_state_str_format.format(*state)
 def print_state(state):
-    print(print_state_str_format.format(*state))
+    print(state_str(state))
 
+map_template = """
+#############
+#ab.g.l.q.vw#
+###c#h#m#r###
+  #d#i#n#s#
+  #e#j#o#t#
+  #f#k#p#u#
+  #########
+""".strip()
+
+def parse_map(state_map):
+    state_map = state_map.strip()
+    res = ""
+    for idx in (map_template.index(c) for c in "abcdefghijklmnopqrstuvw"):
+        res += state_map[idx]
+
+    assert state_str(res).strip() == state_map.strip()
+    return res
 
 # source for pq implementation:
 # https://docs.python.org/3/library/heapq.html#priority-queue-implementation-notes
@@ -185,8 +205,10 @@ distance = defaultdict(lambda: inf)
 distance[start_state] = 0
 add_task(start_state)
 
-while distance[end_state] == inf:
+while True:
     state = pop_task()
+    if state == end_state:
+        break
 
     for next_state, energy in valid_transitions(state):
         candidate_distance = distance[state] + energy
