@@ -1,3 +1,6 @@
+from functools import lru_cache
+from tqdm import tqdm
+
 with open("input.txt", "r") as f:
     content = f.read().strip()
 
@@ -6,15 +9,9 @@ lines = content.split("\n")
 DIGITS = "123456789"
 
 init_state = (0, 0, 0, 0, 0)
-to_explore = [init_state]
-visited = set()
-traceback = {}
 
-while len(to_explore) > 0:
-    state = to_explore.pop(0)
-    if state in visited:
-        continue
-    visited.add(state)
+@lru_cache(maxsize=10**7)
+def explore(state):
     instruction_ptr, w, x, y, z = state
 
     while instruction_ptr < len(lines):
@@ -22,40 +19,56 @@ while len(to_explore) > 0:
         match op:
             case "inp":
                 var_to_set, = args
-                for d in DIGITS:
-                    exec(f"{var_to_set} = {d}")
-                    new_state = (instruction_ptr + 1, w, x, y, z)
-                    to_explore.append(new_state)
-                    traceback[new_state] = (state, d)
-                break
+                for d in tqdm(DIGITS[::-1]) if instruction_ptr < 100 else DIGITS[::-1]:
+                    rhs = int(d)
+                    match var_to_set:
+                        case "w":
+                            new_state = (instruction_ptr + 1, rhs, x, y, z)
+                        case "x":
+                            new_state = (instruction_ptr + 1, w, rhs, y, z)
+                        case "y":
+                            new_state = (instruction_ptr + 1, w, x, rhs, z)
+                        case "z":
+                            new_state = (instruction_ptr + 1, w, x, y, rhs)
+                        case _:
+                            raise Exception
+                    res = explore(new_state)
+                    if res is not None:
+                        return str(d) + res
+                return
             case "add":
                 assert len(args) == 2
-                term1, term2 = args
-                exec(f"{term1} += {term2}")
+                var_to_set, term2 = args
+                rhs = eval(f"{var_to_set} + {term2}")
             case "mul":
                 assert len(args) == 2
-                term1, term2 = args
-                exec(f"{term1} *= {term2}")
+                var_to_set, term2 = args
+                rhs = eval(f"{var_to_set} * {term2}")
             case "div":
                 assert len(args) == 2
-                term1, term2 = args
-                exec(f"{term1} //= {term2}")
+                var_to_set, term2 = args
+                rhs = eval(f"{var_to_set} // {term2}")
             case "mod":
                 assert len(args) == 2
-                term1, term2 = args
-                exec(f"{term1} %= {term2}")
+                var_to_set, term2 = args
+                rhs = eval(f"{var_to_set} % {term2}")
             case "eql":
                 assert len(args) == 2
-                term1, term2 = args
-                exec(f"{term1} = int({term1} == {term2})")
+                var_to_set, term2 = args
+                rhs = eval(f"int({var_to_set} == {term2})")
+        match var_to_set:
+            case "w":
+                w = rhs
+            case "x":
+                x = rhs
+            case "y":
+                y = rhs
+            case "z":
+                z = rhs
+            case _:
+                raise Exception
         instruction_ptr += 1
-    else:
-        if z != 0:
-            continue
+    if z == 0:
+        return ""
 
-        state_trace = state
-        model_num_rev = []
-        while state_trace != init_state:
-            state_trace, d = traceback[state_trace]
-            model_num_rev.append(d)
-        print("".join(model_num_rev[::-1]))
+print(explore(init_state))
