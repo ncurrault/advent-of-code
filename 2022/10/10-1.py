@@ -1,0 +1,10 @@
+import string
+import re
+import math
+from collections import defaultdict
+
+PRACTICE = True
+with open("test.txt" if PRACTICE else "input", "r") as f:
+    file_content = f.read().strip()
+
+lines = file_content.split("\n")
