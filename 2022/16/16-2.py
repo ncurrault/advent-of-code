@@ -50,18 +50,24 @@ def total_release_upper_bound(node: Node):
     )
     # best case is that we (and elephant) immediately open the two best valves,
     # then move to the next best ones, etc.
-    res = 0
+    res = node.pressure_released
     if node.remaining_time == 0:
         return node.pressure_released
-    remaining_time = node.remaining_time - 1  # lose one second for first
+    remaining_time = node.remaining_time
+
+    if node.human_valve in node.open_valves and node.elephant_valve in node.open_valves:
+        remaining_time -= 1
+        # both need to move to and open valves that are useful first
+
     for i in range(0, len(remaining_flow_rates), 2):
+        remaining_time -= 1  # open valve
         res += remaining_flow_rates[i] * remaining_time
         if i + 1 < len(remaining_flow_rates):
             res += remaining_flow_rates[i + 1] * remaining_time
-        remaining_time -= 2
+        remaining_time -= 1  # move
         if remaining_time <= 0:
             break
-    return node.pressure_released + res
+    return res
 
 
 to_explore = [
