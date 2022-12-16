@@ -70,12 +70,17 @@ def total_release_upper_bound(node: Node):
     return res
 
 
+valves = set(v for v in flow_rates)
+zero_flow_valves = set(v for v in valves if flow_rates[v] == 0)
+# treat 0-flow valves as if they're already open so we don't waste time
+# trying to open them
+
 to_explore = [
     Node(
         human_valve="AA",
         elephant_valve="AA",
-        open_valves=set(),
-        closed_valves=set(v for v in flow_rates),
+        open_valves=zero_flow_valves,
+        closed_valves=(valves - zero_flow_valves),
         pressure_released=0,
         remaining_time=26,
     )
