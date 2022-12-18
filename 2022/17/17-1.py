@@ -36,12 +36,12 @@ def max_occupied_row(chamber):
 
 def print_chamber(chamber, rock):
     chamber_height = max_occupied_row(chamber | rock) + 1
-    for i in range(chamber_height - 1, -1, -1):
+    for y in range(chamber_height - 1, -1, -1):
         row = ""
-        for j in range(CHAMBER_WIDTH):
-            if (i, j) in chamber:
+        for x in range(CHAMBER_WIDTH):
+            if (x, y) in chamber:
                 row += "#"
-            elif (i, j) in rock:
+            elif (x, y) in rock:
                 row += "@"
             else:
                 row += "."
