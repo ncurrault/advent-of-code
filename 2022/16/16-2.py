@@ -8,7 +8,7 @@ import random
 import tqdm
 from dataclasses import dataclass
 
-PRACTICE = True
+PRACTICE = False
 with open("test.txt" if PRACTICE else "input", "r") as f:
     file_content = f.read().strip()
 lines = file_content.split("\n")
