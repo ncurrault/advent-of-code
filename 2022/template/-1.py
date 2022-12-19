@@ -5,6 +5,8 @@ from collections import defaultdict
 from enum import Enum
 import itertools
 import tqdm
+from dataclasses import dataclass
+import random
 
 PRACTICE = True
 with open("test.txt" if PRACTICE else "input", "r") as f:
