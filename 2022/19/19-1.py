@@ -8,7 +8,7 @@ import tqdm
 from dataclasses import dataclass
 import random
 
-PRACTICE = True
+PRACTICE = False
 with open("test.txt" if PRACTICE else "input", "r") as f:
     file_content = f.read().strip()
 lines = file_content.split("\n")
@@ -76,7 +76,7 @@ def geodes_upper_bound(node: Node):
     remaining_time = node.remaining_time
     while remaining_time > 0:
         remaining_time -= 1
-        res += remaining_time  # new robot every minute
+        res += remaining_time
     return res
 
 
@@ -85,6 +85,12 @@ TOTAL_TIME = 24
 res = 0
 
 for bp_id, blueprint in blueprints.items():
+    max_ore_robots = max(
+        blueprint.ore_robot_ore, blueprint.clay_robot_ore, blueprint.geode_robot_ore
+    )
+    max_clay_robots = blueprint.obsidian_robot_clay
+    max_obsidian_robots = blueprint.geode_robot_obsidian
+
     max_so_far = 0
     to_explore = [
         Node(
@@ -145,7 +151,7 @@ for bp_id, blueprint in blueprints.items():
         # if not, we can build another robot or just wait
         candidates = []
 
-        if node.ore >= blueprint.ore_robot_ore:
+        if node.ore >= blueprint.ore_robot_ore and node.ore_robots < max_ore_robots:
             candidates.append(
                 Node(
                     ore=base_node.ore - blueprint.ore_robot_ore,
@@ -159,7 +165,7 @@ for bp_id, blueprint in blueprints.items():
                     remaining_time=base_node.remaining_time,
                 )
             )
-        if node.ore >= blueprint.clay_robot_ore:
+        if node.ore >= blueprint.clay_robot_ore and node.clay_robots < max_clay_robots:
             candidates.append(
                 Node(
                     ore=base_node.ore - blueprint.clay_robot_ore,
@@ -176,6 +182,7 @@ for bp_id, blueprint in blueprints.items():
         if (
             node.ore >= blueprint.obsidian_robot_ore
             and node.clay >= blueprint.obsidian_robot_clay
+            and node.obsidian_robots < max_obsidian_robots
         ):
             candidates.append(
                 Node(
