@@ -53,10 +53,6 @@ while any(wd in unknown_values for wd in root_deps):
         else:
             unknown_values[monkey] = (yell, new_deps)
 
-print(
-    sympy.solve(
-        f"{known_values[root_deps[0]]} - {known_values[root_deps[1]]}".replace(
-            "//", "/"
-        )
-    )
-)
+eqn = f"{known_values[root_deps[0]]} - {known_values[root_deps[1]]}".replace("//", "/")
+print(sympy.simplify(eqn), "== 0")
+print(sympy.solve(eqn))
