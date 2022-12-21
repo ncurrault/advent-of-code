@@ -32,7 +32,7 @@ while "root" not in known_values:
         yell, deps = unknown_values[monkey]
         new_deps = [dep for dep in deps if dep not in known_values]
         if len(new_deps) == 0:
-            globals().update(known_values.items())
+            globals().update(known_values)
             known_values[monkey] = eval(yell)
         else:
             unknown_values[monkey] = (yell, new_deps)
