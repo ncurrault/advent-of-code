@@ -67,8 +67,9 @@ def print_locs(elf_locations):
     print()
 
 
-N_TURNS = 10
-for turn in range(N_TURNS):
+turns = 0
+while True:
+    turns += 1
     # print_locs(elf_locations)
     proposed_locations = defaultdict(list)
     new_locs = set()
@@ -91,20 +92,9 @@ for turn in range(N_TURNS):
             new_locs.update(origins)
         else:
             new_locs.add(loc)
+
+    if new_locs == elf_locations:
+        break
     elf_locations = new_locs
 
-min_x = math.inf
-min_y = math.inf
-max_x = -math.inf
-max_y = -math.inf
-for x, y in elf_locations:
-    if x > max_x:
-        max_x = x
-    if y > max_y:
-        max_y = y
-    if x < min_x:
-        min_x = x
-    if y < min_y:
-        min_y = y
-
-print((max_x - min_x + 1) * (max_y - min_y + 1) - len(elf_locations))
+print(turns)
